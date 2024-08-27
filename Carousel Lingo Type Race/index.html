@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Game - 100 Meter Race</title>
+    <style>
+        body {
+            font-family: "Helvetica", monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ccc0b2; /* Set the background color to grey */
+        }
+        #game-container {
+            text-align: center;
+            position: relative;
+            width: 80%;
+            display: none; /* Hide the game container initially */
+        }
+
+        #language-selection {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            user-select: none; /* Disable text selection */
+            cursor: default; /* Disable text cursor */
+        }
+
+        #language-selection button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            width: 200px;
+        }
+
+        .track {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px; /* Increased spacing between tracks */
+            position: relative;
+            height: 30px; /* Added height for each track */
+            user-select: none; /* Disable text selection */
+            cursor: default; /* Disable text cursor */
+        }
+        .dot {
+            height: 20px;
+            width: 20px;
+            background-color: rgb(32, 32, 32);
+            border-radius: 50%;
+            position: absolute;
+            left: calc(95% - 20px); /* Move to slightly left of the right edge */
+        }
+        .player-dot {
+            background-color: rgb(248, 248, 248); /* The player's dot is red */
+            border: 2px solid black; /* Add a black outline with a thickness of 2px */
+        }
+        .finish-time {
+            position: absolute;
+            right: -110px; /* Ensure this is beyond the finish line */
+            font-size: 1.2em;
+            color: green;
+        }
+        .fastest-time {
+            font-size: 1.2em; /* Make the text larger */
+            font-weight: bold; /* Make the text thicker */
+            color: red; /* Change the color */
+            right: -110px; /* Ensure this is beyond the finish line */
+        }
+        #sentence {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+        #translation {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: gray;
+        }
+        #timer {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        #input-box {
+            padding: 10px;
+            font-size: 1em;
+            width: 100%;
+            max-width: 400px;
+        }
+        #result {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        #ready-btn, #new-sentence-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            display: block;  /* Ensure they are block elements */
+            width: 200px;    /* Set a fixed width to align them */
+            margin-left: auto;
+            margin-right: auto; /* Center them */
+        }
+        #ready-message {
+            font-size: 1.5em;
+            min-height: 30px; /* Reserve space for the message */
+            margin-top: 20px;  /* Adjust margin as needed */
+            user-select: none; /* Disable text selection */
+            cursor: default; /* Disable text cursor */
+        }
+        #back-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            display: block;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        /* Change text selection color to grey */
+        ::selection {
+            background: #888888; /* Grey background for selected text */
+            color: white; /* White text color for selected text */
+        }
+
+        /* Disable text selection and cursor in specific areas */
+        .track, .dot, .finish-time {
+            user-select: none; /* Disable text selection */
+            cursor: default; /* Disable text cursor */
+        }
+
+    </style>
+</head>
+<body>
+    <div id="language-selection">
+        <h1>Select a Language to Learn</h1>
+        <button id="french-btn">French</button>
+        <button id="dutch-btn">Dutch</button>
+    </div>
+    <div id="game-container">
+        
+        <!-- Runners' tracks -->
+        <div class="track"><div class="dot"></div><div class="finish-time"></div></div>
+        <div class="track"><div class="dot"></div><div class="finish-time"></div></div>
+        <div class="track"><div class="dot"></div><div class="finish-time"></div></div>
+        <div class="track"><div class="dot player-dot"></div><div class="finish-time"></div></div>
+        <div class="track"><div class="dot"></div><div class="finish-time"></div></div>
+        <div class="track"><div class="dot"></div><div class="finish-time"></div></div>
+
+        <!-- The rest of the game interface -->
+        <div id="ready-message"></div>
+        <div id="sentence"></div>
+        <div id="translation"></div>
+        <div id="timer">Time: 0.00 seconds</div>
+        <input type="text" id="input-box" placeholder="Type the French sentence here..." disabled>
+        <div id="result"></div>
+        <button id="ready-btn">Ready</button>
+        <button id="new-sentence-btn">Get New Sentence</button>
+        <button id="back-btn">Back to Language Selection</button>
+
+    </div>
+
+    <!-- Include the sentences.js file here -->
+    <script src="sentences_fr.js"></script>
+    <script src="sentences_nl.js"></script>
+    
+
+    <script>
+        // Declare global variables
+        let sentences; 
+        let gameContainer = document.getElementById('game-container');
+        let languageSelection = document.getElementById('language-selection');
+
+        // Language selection buttons
+        const frenchBtn = document.getElementById('french-btn');
+        const dutchBtn = document.getElementById('dutch-btn');
+
+        // Add event listeners to language buttons
+        frenchBtn.addEventListener('click', () => {
+            loadLanguage('french');
+        });
+
+        dutchBtn.addEventListener('click', () => {
+            loadLanguage('dutch');
+        });
+
+        // Function to load the selected language
+        function loadLanguage(language) {
+            if (language === 'french') {
+                sentences = sentences_fr;
+            } else if (language === 'dutch') {
+                sentences = sentences_nl;
+            }
+            
+            languageSelection.style.display = 'none';
+            gameContainer.style.display = 'block';
+
+            resetGame();
+        }
+
+        // Game logic variables
+        let currentSentence;
+        let sentenceText;
+        let sentenceDisplay = document.getElementById('sentence');
+        let translationDisplay = document.getElementById('translation');
+        let inputBox = document.getElementById('input-box');
+        let timerDisplay = document.getElementById('timer');
+        let resultDisplay = document.getElementById('result');
+        let readyBtn = document.getElementById('ready-btn');
+        let newSentenceBtn = document.getElementById('new-sentence-btn');
+        let readyMessage = document.getElementById('ready-message');
+        let backBtn = document.getElementById('back-btn');
+
+        let startTime;
+        let timerInterval;
+        let timerStarted = false;
+        let playerFinished = false;
+        let playerDot;
+        let runnerTimeouts = [];
+        let countdownTimeout; // New variable for countdown timeout
+
+        // Add event listeners for game actions
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                if (inputBox.disabled && !timerStarted) {
+                    readyBtn.click();
+                } else if (inputBox.disabled && timerStarted) {
+                    newSentenceBtn.click();
+                }
+            }
+        });
+
+        readyBtn.addEventListener('click', startCountdown);
+        inputBox.addEventListener('input', checkInput);
+        newSentenceBtn.addEventListener('click', resetGame);
+
+        // Back to language selection
+        backBtn.addEventListener('click', () => {
+            gameContainer.style.display = 'none';
+            languageSelection.style.display = 'flex';
+        });
+
+        // Start countdown to begin the game
+        function startCountdown() {
+            readyBtn.disabled = true;
+            readyMessage.textContent = "Get ready...";
+            countdownTimeout = setTimeout(() => {
+                readyMessage.textContent = "Set...";
+                const randomDelay = Math.random() * 3000 + 2000;
+                countdownTimeout = setTimeout(() => {
+                    readyMessage.textContent = "Go!";
+                    startRunners();
+                    startTimer();
+                    inputBox.disabled = false;
+                    inputBox.focus();
+                }, randomDelay);
+            }, 2000);
+        }
+
+        // Timer functions
+        function startTimer() {
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 10);
+            timerStarted = true;
+        }
+
+        function updateTimer() {
+            const currentTime = new Date();
+            const elapsedTime = (currentTime - startTime) / 1000;
+            timerDisplay.textContent = `Time: ${elapsedTime.toFixed(2)} seconds`;
+        }
+
+        // Normalize input for comparison
+        function normalizeText(text) {
+            return text
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+                .replace(/œ/g, "o"); 
+        }
+
+        // Check input against the sentence
+        function checkInput() {
+            const normalizedInput = normalizeText(inputBox.value);
+            const normalizedSentence = normalizeText(sentenceText);
+
+            if (normalizedInput === normalizedSentence && !playerFinished) {
+                clearInterval(timerInterval);
+                const finalTime = parseFloat(timerDisplay.textContent.split(' ')[1]);
+                resultDisplay.textContent = "Correct! You typed the sentence in " + finalTime.toFixed(2) + " seconds";
+                displayPlayerFinishTime(finalTime.toFixed(2));
+                inputBox.disabled = true;
+                playerFinished = true;
+            }
+            updatePlayerProgress();
+        }
+
+        // Update player progress
+        function updatePlayerProgress() {
+            const normalizedInput = normalizeText(inputBox.value);
+            const normalizedSentence = normalizeText(sentenceText);
+
+            let correctChars = 0;
+            for (let i = 0; i < normalizedInput.length; i++) {
+                if (normalizedInput[i] === normalizedSentence[i]) {
+                    correctChars++;
+                } else {
+                    break;
+                }
+            }
+
+            const progress = correctChars / sentenceText.length;
+
+            if (playerDot) {
+                playerDot.style.left = `calc(${progress * 100}% - 40px)`;
+            }
+        }
+
+        // Display player finish time
+        function displayPlayerFinishTime(time) {
+            const playerFinishTime = document.querySelector('.player-dot').nextElementSibling;
+            playerFinishTime.textContent = `${time} seconds`;
+
+            highlightFastestTime();
+        }
+
+        // Highlight the fastest time
+        function highlightFastestTime() {
+            const finishTimes = document.querySelectorAll('.finish-time');
+            let fastestTimeElement = null;
+            let fastestTime = Infinity;
+
+            finishTimes.forEach(timeElement => {
+                const timeText = timeElement.textContent;
+                const timeValue = parseFloat(timeText);
+                if (!isNaN(timeValue) && timeValue < fastestTime) {
+                    fastestTime = timeValue;
+                    fastestTimeElement = timeElement;
+                }
+            });
+
+            finishTimes.forEach(timeElement => {
+                timeElement.classList.remove('fastest-time');
+            });
+
+            if (fastestTimeElement) {
+                fastestTimeElement.classList.add('fastest-time');
+            }
+        }
+
+        // Reset game for a new sentence
+        function resetGame() {
+            clearInterval(timerInterval);
+            clearTimeout(countdownTimeout); // Clear the countdown timeout
+            timerStarted = false;
+
+            runnerTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+            runnerTimeouts = [];
+
+            readyBtn.disabled = false; // Re-enable the ready button
+
+            currentSentence = sentences[Math.floor(Math.random() * sentences.length)];
+            sentenceText = currentSentence.sentence;
+            sentenceDisplay.textContent = sentenceText;
+            translationDisplay.textContent = `(${currentSentence.translation})`;
+
+            inputBox.value = "";
+            inputBox.disabled = true;
+            timerDisplay.textContent = "Time: 0.00 seconds";
+            resultDisplay.textContent = "";
+            readyMessage.textContent = "";
+            playerFinished = false;
+
+            const tracks = document.querySelectorAll('.track');
+            playerTrackIndex = Math.floor(Math.random() * tracks.length);
+            tracks.forEach((track, index) => {
+                const dot = track.querySelector('.dot');
+                const finishTime = track.querySelector('.finish-time');
+                dot.classList.remove('player-dot');
+                dot.style.transition = 'none';
+                dot.style.left = '0';
+                finishTime.textContent = '';
+
+                if (index === playerTrackIndex) {
+                    dot.classList.add('player-dot');
+                }
+            });
+
+            playerDot = document.querySelector('.player-dot');
+        }
+
+        // Runner animation based on sentence length
+        function startRunners() {
+            const tracks = document.querySelectorAll('.track');
+            runnerTimeouts = [];
+
+            const baseTimePerChar = 200;
+            const minTimePerChar = 150;
+            const maxTimePerChar = 300;
+
+            const sentenceLength = sentenceText.length;
+
+            tracks.forEach((track, index) => {
+                const dot = track.querySelector('.dot');
+                if (index !== playerTrackIndex) {
+                    const runTime = (Math.random() * (maxTimePerChar - minTimePerChar) + minTimePerChar) * sentenceLength;
+
+                    dot.style.transition = `left ${runTime}ms linear`;
+                    dot.style.left = 'calc(100% - 40px)';
+
+                    const timeoutId = setTimeout(() => {
+                        const finishTime = (runTime / 1000).toFixed(2);
+                        track.querySelector('.finish-time').textContent = `${finishTime} seconds`;
+
+                        highlightFastestTime();
+                    }, runTime);
+
+                    runnerTimeouts.push(timeoutId);
+                }
+            });
+        }
+
+        // Initialize the game with a random sentence on page load
+        // resetGame();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
