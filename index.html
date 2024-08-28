@@ -5,21 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typing Game - 100 Meter Race</title>
     <style>
+        /* Existing styles... */
         body {
-            font-family: "Helvetica", monospace;
+            font-family: "Georgia", sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #ccc0b2; /* Set the background color to grey */
+            background-color: #c7c7c7;
         }
+
+        /* font-family: "Helvetica", monospace; */
+
         #game-container {
             text-align: center;
             position: relative;
             width: 80%;
-            display: none; /* Hide the game container initially */
+            display: none;
         }
 
         #language-selection {
@@ -29,92 +33,135 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            user-select: none; /* Disable text selection */
-            cursor: default; /* Disable text cursor */
+            user-select: none;
+            cursor: default;
         }
 
+        /* #language-selection button:hover {
+            background-color: #6a6797; 
+            transform: scale(1.05); 
+        } */
+
+
         #language-selection button {
+            font-family: "Georgia", sans-serif;
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 1.2em;
             cursor: pointer;
             width: 200px;
+            border-radius: 15px; /* Fully rounded */
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        /* margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            display: block;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 15px; */
+
+        #speed-selection button {
+            font-family: "Georgia", sans-serif;
+            margin-top: 5px;
+            padding: 5px 10px;
+            font-size: 1em;
+            cursor: pointer;
+            width: 100px;
+            border-radius: 15px; /* Fully rounded */
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        #speed-selection button:active {
+            transform: scale(0.96); /* Slightly shrinks on click */
+        }
+
+        #speed-selection {
+            display: flex;
+            gap: 5px; /* Add some spacing between buttons */
+            margin-bottom: 20px; /* Add some margin below the speed selection */
+            justify-content: center; /* Center the buttons horizontally */
+            margin-top: 20px; /* Add some space above the buttons */
         }
 
         .track {
             display: flex;
             align-items: center;
-            margin-bottom: 20px; /* Increased spacing between tracks */
+            margin-bottom: 20px;
             position: relative;
-            height: 30px; /* Added height for each track */
-            user-select: none; /* Disable text selection */
-            cursor: default; /* Disable text cursor */
+            height: 30px;
+            user-select: none;
+            cursor: default;
         }
+
         .dot {
             height: 20px;
             width: 20px;
             background-color: rgb(32, 32, 32);
             border-radius: 50%;
             position: absolute;
-            left: calc(95% - 20px); /* Move to slightly left of the right edge */
+            left: 0; /* Set the initial position of the dots to the starting line */
         }
+
         .player-dot {
-            background-color: rgb(248, 248, 248); /* The player's dot is red */
-            border: 2px solid black; /* Add a black outline with a thickness of 2px */
+            background-color: rgb(248, 248, 248);
+            border: 2px solid black;
         }
+
         .finish-time {
             position: absolute;
-            right: -110px; /* Ensure this is beyond the finish line */
+            right: -110px;
             font-size: 1.2em;
-            color: green;
+            color: rgb(65, 134, 80);
         }
+
         .fastest-time {
-            font-size: 1.2em; /* Make the text larger */
-            font-weight: bold; /* Make the text thicker */
-            color: red; /* Change the color */
-            right: -110px; /* Ensure this is beyond the finish line */
+            font-size: 1.15em;
+            font-weight: bold;
+            color: rgb(126, 0, 165);
+            right: -110px;
         }
+
         #sentence {
             font-size: 1.5em;
             margin: 20px 0;
         }
+
+        #pinyin {
+            font-size: 1.3em;
+            color: rgb(146, 124, 0);
+            margin-bottom: 10px;
+        }
+
         #translation {
             font-size: 1.2em;
             margin-bottom: 20px;
-            color: gray;
+            color: rgb(150, 82, 82);
         }
+
         #timer {
             font-size: 1.2em;
             margin: 10px 0;
         }
+
         #input-box {
             padding: 10px;
             font-size: 1em;
             width: 100%;
             max-width: 400px;
+            border-radius: 15px; /* Fully rounded */
         }
+
         #result {
             font-size: 1.2em;
+            min-height: 30px;
             margin-top: 20px;
         }
-        #ready-btn, #new-sentence-btn {
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 1em;
-            cursor: pointer;
-            display: block;  /* Ensure they are block elements */
-            width: 200px;    /* Set a fixed width to align them */
-            margin-left: auto;
-            margin-right: auto; /* Center them */
-        }
-        #ready-message {
-            font-size: 1.5em;
-            min-height: 30px; /* Reserve space for the message */
-            margin-top: 20px;  /* Adjust margin as needed */
-            user-select: none; /* Disable text selection */
-            cursor: default; /* Disable text cursor */
-        }
-        #back-btn {
+        
+        /* #ready-btn, #new-sentence-btn {
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 1em;
@@ -123,18 +170,152 @@
             width: 200px;
             margin-left: auto;
             margin-right: auto;
-        }
-        /* Change text selection color to grey */
-        ::selection {
-            background: #888888; /* Grey background for selected text */
-            color: white; /* White text color for selected text */
+            border-radius: 15px;
+        } */
+
+        #ready-btn, #new-sentence-btn {
+            font-family: "Georgia", sans-serif;
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            display: block;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 15px; /* Fully rounded */
+            transition: background-color 0.2s ease, transform 0.2s ease;
         }
 
-        /* Disable text selection and cursor in specific areas */
-        .track, .dot, .finish-time {
-            user-select: none; /* Disable text selection */
-            cursor: default; /* Disable text cursor */
+        /* #language-selection button:hover {
+            background-color: #6a6797;
+            transform: scale(1.05); 
+        } */
+
+        #ready-message {
+            position: absolute;
+            top: 20%; /* Adjusted to be higher in the track area */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            text-align: center;
+            color: red; /* Make the text more visible */
+            z-index: 100; /* Ensure it stays above other elements */
         }
+
+        #back-btn {
+            font-family: "Georgia", sans-serif;
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            display: block;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: rgb(216, 192, 185);
+            color: rgb(146, 86, 86);
+            border-radius: 15px; /* Fully rounded */
+            
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        /* Custom selection color */
+        ::selection {
+            background: #888888;
+            color: white;
+        }
+
+        .selected {
+            background-color: #4c6faf; /* Green background */
+            color: white; /* White text */
+            border: 2px solid #32355e; /* Darker green border */
+        }
+
+        .traditional-chinese-font {
+            font-family: 'SimSun', 'MingLiU', 'PMingLiU', 'serif'; /* Traditional Chinese fonts */
+            font-size: 3em !important; /* Ensure the font size is doubled */
+        }
+
+
+
+
+
+        @media (max-width: 768px) {
+            #game-container {
+                width: 90%;
+                padding: 10px;
+            }
+
+            #language-selection button, #speed-selection button, #ready-btn, #new-sentence-btn, #back-btn {
+                width: 80%;
+                font-size: 1em;
+                padding: 8px 15px;
+            }
+
+            #input-box {
+                width: 100%;
+                max-width: 100%;
+                font-size: 1em;
+            }
+
+            #ready-message {
+                font-size: 1.5em;
+                top: 15%;
+            }
+
+            #sentence {
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #game-container {
+                width: 95%;
+            }
+
+            #ready-message {
+                font-size: 1.2em;
+                top: 10%;
+            }
+
+            #sentence, #translation, #timer {
+                font-size: 1em;
+            }
+
+            #speed-selection button {
+                width: 70px;
+                font-size: 0.9em;
+            }
+        }
+
+
+        @keyframes growFadeIn {
+            0% {
+                opacity: 0;
+                font-size: 1em;
+            }
+            70% {
+                opacity: 1;
+                font-size: 2.2em;
+            }
+            100% {
+                opacity: 1;
+                font-size: 2em;
+            }
+        }
+
+        @keyframes fadeOutShrink {
+            0% {
+                opacity: 1;
+                font-size: 2em;
+            }
+            100% {
+                opacity: 0;
+                font-size: 1em;
+            }
+        }
+
 
     </style>
 </head>
@@ -143,9 +324,10 @@
         <h1>Select a Language to Learn</h1>
         <button id="french-btn">French</button>
         <button id="dutch-btn">Dutch</button>
+        <button id="chinese-btn">Chinese</button>
     </div>
     <div id="game-container">
-        
+
         <!-- Runners' tracks -->
         <div class="track"><div class="dot"></div><div class="finish-time"></div></div>
         <div class="track"><div class="dot"></div><div class="finish-time"></div></div>
@@ -154,33 +336,46 @@
         <div class="track"><div class="dot"></div><div class="finish-time"></div></div>
         <div class="track"><div class="dot"></div><div class="finish-time"></div></div>
 
-        <!-- The rest of the game interface -->
         <div id="ready-message"></div>
         <div id="sentence"></div>
+        <div id="pinyin"></div>
         <div id="translation"></div>
         <div id="timer">Time: 0.00 seconds</div>
-        <input type="text" id="input-box" placeholder="Type the French sentence here..." disabled>
-        <div id="result"></div>
+        <input type="text" id="input-box" placeholder="Type the sentence here..." disabled>
+        <!-- <div id="result"></div> -->
+        <div id="speed-selection">
+            <button id="slow-btn">Slow</button>
+            <button id="normal-btn">Normal</button>
+            <button id="fast-btn">Fast</button>
+        </div>
         <button id="ready-btn">Ready</button>
         <button id="new-sentence-btn">Get New Sentence</button>
         <button id="back-btn">Back to Language Selection</button>
-
     </div>
 
     <!-- Include the sentences.js file here -->
     <script src="sentences_fr.js"></script>
     <script src="sentences_nl.js"></script>
-    
+    <script src="sentences_zh.js"></script>
 
     <script>
         // Declare global variables
-        let sentences; 
+        let sentences;
         let gameContainer = document.getElementById('game-container');
         let languageSelection = document.getElementById('language-selection');
+        let inputBox = document.getElementById('input-box');
+        let speedSelection = document.getElementById('speed-selection');
+        let selectedSpeed = "normal"; // Default speed
 
         // Language selection buttons
         const frenchBtn = document.getElementById('french-btn');
         const dutchBtn = document.getElementById('dutch-btn');
+        const chineseBtn = document.getElementById('chinese-btn');
+
+        // Speed selection buttons
+        const slowBtn = document.getElementById('slow-btn');
+        const normalBtn = document.getElementById('normal-btn');
+        const fastBtn = document.getElementById('fast-btn');
 
         // Add event listeners to language buttons
         frenchBtn.addEventListener('click', () => {
@@ -191,26 +386,72 @@
             loadLanguage('dutch');
         });
 
-        // Function to load the selected language
+        chineseBtn.addEventListener('click', () => {
+            loadLanguage('chinese');
+        });
+
+        // Add event listeners to speed buttons
+        slowBtn.addEventListener('click', () => {
+            selectedSpeed = "slow";
+            slowBtn.classList.add('selected');
+            normalBtn.classList.remove('selected');
+            fastBtn.classList.remove('selected');
+        });
+
+        normalBtn.addEventListener('click', () => {
+            selectedSpeed = "normal";
+            slowBtn.classList.remove('selected');
+            normalBtn.classList.add('selected');
+            fastBtn.classList.remove('selected');
+        });
+
+        fastBtn.addEventListener('click', () => {
+            selectedSpeed = "fast";
+            slowBtn.classList.remove('selected');
+            normalBtn.classList.remove('selected');
+            fastBtn.classList.add('selected');
+        });
+
+        // // Function to load the selected language
         function loadLanguage(language) {
+            const sentenceDisplay = document.getElementById('sentence');
+
             if (language === 'french') {
                 sentences = sentences_fr;
+                document.getElementById('pinyin').style.display = 'none'; // Hide Pinyin for non-Chinese
+                sentenceDisplay.classList.remove('traditional-chinese-font'); // Remove the Chinese font class if it exists
             } else if (language === 'dutch') {
                 sentences = sentences_nl;
+                document.getElementById('pinyin').style.display = 'none'; // Hide Pinyin for non-Chinese
+                sentenceDisplay.classList.remove('traditional-chinese-font'); // Remove the Chinese font class if it exists
+            } else if (language === 'chinese') {
+                sentences = sentences_zh;
+                document.getElementById('pinyin').style.display = 'block'; // Show Pinyin for Chinese
+                sentenceDisplay.classList.add('traditional-chinese-font'); // Apply the Chinese font class
             }
             
             languageSelection.style.display = 'none';
             gameContainer.style.display = 'block';
 
             resetGame();
+
+            // Initialize selected speed button
+            if (selectedSpeed === "slow") {
+                slowBtn.classList.add('selected');
+            } else if (selectedSpeed === "normal") {
+                normalBtn.classList.add('selected');
+            } else if (selectedSpeed === "fast") {
+                fastBtn.classList.add('selected');
+            }
         }
 
         // Game logic variables
         let currentSentence;
         let sentenceText;
+        let pinyinText;
         let sentenceDisplay = document.getElementById('sentence');
+        let pinyinDisplay = document.getElementById('pinyin'); // Pinyin display
         let translationDisplay = document.getElementById('translation');
-        let inputBox = document.getElementById('input-box');
         let timerDisplay = document.getElementById('timer');
         let resultDisplay = document.getElementById('result');
         let readyBtn = document.getElementById('ready-btn');
@@ -224,7 +465,7 @@
         let playerFinished = false;
         let playerDot;
         let runnerTimeouts = [];
-        let countdownTimeout; // New variable for countdown timeout
+        let countdownTimeout;
 
         // Add event listeners for game actions
         document.addEventListener('keydown', function(event) {
@@ -250,16 +491,27 @@
         // Start countdown to begin the game
         function startCountdown() {
             readyBtn.disabled = true;
-            readyMessage.textContent = "Get ready...";
+            readyMessage.innerHTML = "<span style='color: black;'>Get ready...</span>";
             countdownTimeout = setTimeout(() => {
-                readyMessage.textContent = "Set...";
+                readyMessage.innerHTML = "<span style='color: black;'>Set...</span>";
                 const randomDelay = Math.random() * 3000 + 2000;
                 countdownTimeout = setTimeout(() => {
-                    readyMessage.textContent = "Go!";
+                    // Make the "Go!" message red, larger, and bold with the grow and fade in effect
+                    readyMessage.innerHTML = "<span id='goMessage' style='color: red; font-size: 2em; font-weight: bold;'>Go!</span>";
+                    const goMessage = document.getElementById('goMessage');
+                    goMessage.style.animation = "growFadeIn 0.2s forwards";
+
+                    // Start the game immediately when "Go!" starts growing in
                     startRunners();
                     startTimer();
                     inputBox.disabled = false;
                     inputBox.focus();
+
+                    // Apply fade and shrink animation after a delay
+                    setTimeout(() => {
+                        goMessage.style.animation = "fadeOutShrink 1s forwards";
+                    }, 600); // Adjust the delay to keep "Go!" visible before fading out
+
                 }, randomDelay);
             }, 2000);
         }
@@ -290,13 +542,12 @@
             const normalizedSentence = normalizeText(sentenceText);
 
             if (normalizedInput === normalizedSentence && !playerFinished) {
-                clearInterval(timerInterval);
-                const finalTime = parseFloat(timerDisplay.textContent.split(' ')[1]);
-                resultDisplay.textContent = "Correct! You typed the sentence in " + finalTime.toFixed(2) + " seconds";
-                displayPlayerFinishTime(finalTime.toFixed(2));
-                inputBox.disabled = true;
-                playerFinished = true;
-            }
+            clearInterval(timerInterval);
+            const finalTime = parseFloat(timerDisplay.textContent.split(' ')[1]);
+            displayPlayerFinishTime(finalTime.toFixed(2));
+            inputBox.disabled = true;
+            playerFinished = true;
+        }
             updatePlayerProgress();
         }
 
@@ -356,23 +607,24 @@
         // Reset game for a new sentence
         function resetGame() {
             clearInterval(timerInterval);
-            clearTimeout(countdownTimeout); // Clear the countdown timeout
+            clearTimeout(countdownTimeout);
             timerStarted = false;
 
             runnerTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
             runnerTimeouts = [];
 
-            readyBtn.disabled = false; // Re-enable the ready button
+            readyBtn.disabled = false;
 
             currentSentence = sentences[Math.floor(Math.random() * sentences.length)];
             sentenceText = currentSentence.sentence;
+            pinyinText = currentSentence.pinyin; // Get Pinyin text
             sentenceDisplay.textContent = sentenceText;
+            pinyinDisplay.textContent = pinyinText; // Display Pinyin
             translationDisplay.textContent = `(${currentSentence.translation})`;
 
             inputBox.value = "";
             inputBox.disabled = true;
             timerDisplay.textContent = "Time: 0.00 seconds";
-            resultDisplay.textContent = "";
             readyMessage.textContent = "";
             playerFinished = false;
 
@@ -383,7 +635,7 @@
                 const finishTime = track.querySelector('.finish-time');
                 dot.classList.remove('player-dot');
                 dot.style.transition = 'none';
-                dot.style.left = '0';
+                dot.style.left = '0'; // Reset the dots to the start position
                 finishTime.textContent = '';
 
                 if (index === playerTrackIndex) {
@@ -394,16 +646,32 @@
             playerDot = document.querySelector('.player-dot');
         }
 
-        // Runner animation based on sentence length
+
+        // Runner animation based on sentence length and speed selection
         function startRunners() {
             const tracks = document.querySelectorAll('.track');
             runnerTimeouts = [];
 
-            const baseTimePerChar = 200;
-            const minTimePerChar = 150;
-            const maxTimePerChar = 300;
+            let baseTimePerChar;
+            if (selectedSpeed === "slow") {
+                baseTimePerChar = 450;
+            } else if (selectedSpeed === "fast") {
+                baseTimePerChar = 150;
+            } else {
+                baseTimePerChar = 300;
+            }
 
-            const sentenceLength = sentenceText.length;
+            // Add extra slowness for Chinese
+            const isChinese = sentences === sentences_zh;
+            const slownessMultiplier = isChinese ? 2.5 : 1; // Adjust the multiplier to add slowness (1.2 means 20% slower)
+
+            baseTimePerChar *= slownessMultiplier;
+
+            const minTimePerChar = baseTimePerChar - 50;
+            const maxTimePerChar = baseTimePerChar + 100;
+
+            // Adjust length based on whether we're in Chinese mode or not
+            const sentenceLength = isChinese ? pinyinText.length : sentenceText.length;
 
             tracks.forEach((track, index) => {
                 const dot = track.querySelector('.dot');
@@ -425,15 +693,6 @@
             });
         }
 
-        // Initialize the game with a random sentence on page load
-        // resetGame();
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
